@@ -29,8 +29,13 @@
 
 ### API
  - `GET /camera` - return image 
+ - `GET /info` - return phone info 
+ - `GET /camerapREVIEW` - return a small image 
  - `GET /position?timeout=` - return GPS position
- - `POST /go?motor=[speed]&steering[angle]` -  control car
+ - `POST /drive?motor=[speed]&steering[angle]` -  control car
+ - `POST /setStream?ipAddress=[ipAddress]&port[port]` -  set the stream receiver
+ - `POST /startStream` -  start stream to the set receiver
+ - `POST /stopStream` -  stop stream
 
 
 ## Board program

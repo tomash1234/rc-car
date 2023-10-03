@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.location.LocationManager;
+import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -34,6 +35,7 @@ import android.view.View;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.widget.TextView;
 
 import java.io.File;
@@ -52,7 +54,7 @@ import java.util.regex.Pattern;
 
 import fi.iki.elonen.NanoHTTPD;
 
-public class MainActivity extends AppCompatActivity implements PhoneInfoProvider{
+public class MainActivity extends AppCompatActivity implements PhoneInfoProvider, CarControl{
 
     private CarServer server;
     private PreviewView mPreviewView;
@@ -86,16 +88,17 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
         int port = 8080;
         logger.log("Will listen on: " + getLocalIpAddress() + ":" + port);
-        server = new CarServer(port, logger, this);
+        server = new CarServer(port, logger, this, this);
 
         try {
             server.start();
         } catch(IOException ioe) {
             System.out.println("CAR SERVER " + "The server could not start." + ioe.getMessage());
         }
-        System.out.println("CAR SERVER " + "Web server initialized.");
 
         startCamera();
+
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
     public String getLocalIpAddress() {
@@ -151,10 +154,7 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
     private boolean allPermissionsGranted(){
 
-        if(ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED){
-            return false;
-        }
-        return true;
+        return ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void askPermission(){
@@ -212,19 +212,19 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     @Override
     public double[] getLocation(int timeout) {
         final CountDownLatch latch = new CountDownLatch(1);
-        double[] position  = new double[3];
+        double[] position  = new double[5];
         runOnUiThread(() -> {
             try {
                 if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
                         ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    position[2] = -1;
+                    position[3] = -1;
                 }
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 0, location -> {
-                    double lat = location.getLatitude();
-                    double lon = location.getLongitude();
-                    position[0] = lat;
-                    position[1] = lon;
-                    position[2] = 1;
+                    position[0] = location.getLatitude();
+                    position[1] = location.getLongitude();
+                    position[2] = location.getAltitude();
+                    position[3] = location.getSpeed();
+                    position[4] = 1;
                     latch.countDown();
                 });
             }catch (Exception e){
@@ -289,5 +289,37 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
         }
         return file;
+    }
+
+    @Override
+    public double[] getPhoneInfo() {
+        double[] data = new double[2];
+        BatteryManager bm = (BatteryManager) getSystemService(BATTERY_SERVICE);
+        int batLevel = bm.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY);
+
+        data[0] = 0;
+        data[1] = batLevel;
+        return data;
+    }
+
+
+    @Override
+    public void drive(double motor, double steering) {
+        System.out.println("CAR SERVER drive " + motor + " " + steering);
+    }
+
+    @Override
+    public void setStream(String ipAddress, int port) {
+
+    }
+
+    @Override
+    public boolean startStream() {
+        return false;
+    }
+
+    @Override
+    public void stopStream() {
+
     }
 }

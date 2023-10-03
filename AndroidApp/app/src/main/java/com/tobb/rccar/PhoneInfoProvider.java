@@ -10,4 +10,13 @@ public interface PhoneInfoProvider {
 
     File getCameraPreview();
 
+    double[] getPhoneInfo();
+
+    void setStream(String ipAddress, int port);
+
+    boolean startStream();
+
+    void stopStream();
+
+
 }

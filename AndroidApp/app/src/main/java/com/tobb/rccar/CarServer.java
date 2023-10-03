@@ -24,11 +24,13 @@ public class CarServer extends NanoHTTPD {
 
     private MyLogger myLogger;
     private PhoneInfoProvider phoneInfoProvider;
+    private CarControl carControl;
 
-    public CarServer(int port, MyLogger myLogger, PhoneInfoProvider phoneInfoProvider) {
+    public CarServer(int port, MyLogger myLogger, PhoneInfoProvider phoneInfoProvider, CarControl carControl) {
         super(port);
         this.myLogger = myLogger;
         this.phoneInfoProvider = phoneInfoProvider;
+        this.carControl = carControl;
     }
 
     @Override
@@ -51,13 +53,25 @@ public class CarServer extends NanoHTTPD {
                 case "/cameraPreview":
                     response = getCameraPreview();
                     break;
-            }
-        } else if (method.equals("POST")) {
-            switch (uri) {
                 case "/drive":
                     response = postDrive(session);
                     break;
+                case "/setStream":
+                    response = postStream(session);
+                    break;
+                case "/startStream":
+                    response = startStream();
+                    break;
+                case "/stopStream":
+                    response = stopStream();
+                    break;
             }
+        } else if (method.equals("POST")) {
+            /*switch (uri) {
+                case "/drive":
+                    response = postDrive(session);
+                    break;
+            }*/
         }
         if (response != null) {
             myLogger.log(method + " - " + uri + " -" + session.getQueryParameterString());
@@ -69,12 +83,39 @@ public class CarServer extends NanoHTTPD {
         return response;
     }
 
-    private void obtainPosition(){
+    private Response postStream(IHTTPSession session) {
+        if(!session.getParameters().containsKey("ipAddress") || !session.getParameters().containsKey("port")){
+            return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT, "Request has to contain ipAddress and port parameters");
+        }
+        String ipAddress = String.valueOf(session.getParameters().get("ipAddress").get(0));
+        int port = Integer.parseInt(session.getParameters().get("port").get(0));
+        phoneInfoProvider.setStream(ipAddress, port);
+        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, "Set stream to " + ipAddress + ":" + port);
+    }
 
+
+    private Response startStream() {
+
+        boolean ok = phoneInfoProvider.startStream();
+        if(ok){
+            return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, "Stream started");
+        }
+        return newFixedLengthResponse(Response.Status.CONFLICT, NanoHTTPD.MIME_PLAINTEXT, "Cannot start the stream");
+    }
+
+    private Response stopStream() {
+        phoneInfoProvider.stopStream();
+        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, "Stream stopped");
     }
 
     private Response postDrive(IHTTPSession session) {
-        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, "drive");
+        if(!session.getParameters().containsKey("motor") || !session.getParameters().containsKey("steering")){
+            return newFixedLengthResponse(Response.Status.BAD_REQUEST, NanoHTTPD.MIME_PLAINTEXT, "Request has to contain motor and steering parameters");
+        }
+        double motor = Double.parseDouble(session.getParameters().get("motor").get(0));
+        double steering = Double.parseDouble(session.getParameters().get("steering").get(0));
+        carControl.drive(motor, steering);
+        return newFixedLengthResponse(Response.Status.OK, NanoHTTPD.MIME_PLAINTEXT, "receive");
     }
 
     private Response getCamera() {
@@ -117,17 +158,20 @@ public class CarServer extends NanoHTTPD {
         if(position == null){
             return newFixedLengthResponse(Response.Status.CONFLICT,  NanoHTTPD.MIME_PLAINTEXT, "GPS could not be obtained");
         }
-        if(position[2] < 0){
+        if(position[4] < 0){
             return  newFixedLengthResponse(Response.Status.CONFLICT,  NanoHTTPD.MIME_PLAINTEXT, "GPS permissions not granted");
         }
-        if(position[2] < 0.5){
+        if(position[4] < 0.5){
             return newFixedLengthResponse(Response.Status.CONFLICT,  NanoHTTPD.MIME_PLAINTEXT, "GPS could not be obtained before timeout. [" + timeout + "s]" );
         }
         return newFixedLengthResponse(Response.Status.OK,  "application/json",
-                String.format(Locale.US, "{\"lat\": %.8f, \"lon\": %.8f}", position[0], position[1] ));
+                String.format(Locale.US, "{\"lat\": %.8f, \"lon\": %.8f, \"alt\": %.3f, \"speed\": %.3f}", position[0], position[1], position[2], position[3]));
     }
 
     private Response getInfo(){
-        return newFixedLengthResponse(Response.Status.OK,  NanoHTTPD.MIME_PLAINTEXT, "info");
+        double[] info = phoneInfoProvider.getPhoneInfo();
+
+        return newFixedLengthResponse(Response.Status.OK,  "application/json",
+                String.format(Locale.US, "{\"battery\": %.0f}", info[1]));
     }
 }
