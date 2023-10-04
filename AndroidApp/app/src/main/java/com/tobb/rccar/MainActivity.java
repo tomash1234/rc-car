@@ -60,6 +60,9 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     private PreviewView mPreviewView;
     private ImageCapture imageCapture;
     private LocationManager locationManager;
+    private CameraStreamSender cameraStreamSender;
+    private String ipAddress;
+    private int port;
 
     private Executor cameraExecutor = Executors.newSingleThreadExecutor();
 
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
         startCamera();
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        //BoardCommunicator boardCommunicator = new BoardCommunicator(this);
     }
 
     public String getLocalIpAddress() {
@@ -310,16 +315,24 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
     @Override
     public void setStream(String ipAddress, int port) {
-
+        this.ipAddress = ipAddress;
+        this.port = port;
     }
 
     @Override
     public boolean startStream() {
+        if(cameraStreamSender != null){
+            cameraStreamSender.stopStream();
+        }
+        cameraStreamSender = new CameraStreamSender(this, mPreviewView);
+        cameraStreamSender.setReceiver(ipAddress, port);
+        cameraStreamSender.prepare();
+        cameraStreamSender.start();
         return false;
     }
 
     @Override
     public void stopStream() {
-
+        cameraStreamSender.stopStream();
     }
 }
