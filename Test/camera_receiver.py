@@ -19,27 +19,35 @@ def receive_camera():
     host = ''
     udp_socket.bind((host, PORT))
 
-    frame = None
+    BUFF_SIZE = 54003
+    CONTROL_BYTES = 5
+
+    buff = None
     while True:
-        # Receive data from the socket
-        for i in range(10):
-            data, addr = udp_socket.recvfrom(32006)  # 1024 is the buffer size
+        rows = 10
+        r = 0
+        while r < rows:
+            data, addr = udp_socket.recvfrom(BUFF_SIZE + CONTROL_BYTES)  # 1024 is the buffer size
 
-            if frame is None:
-                w = data[1] * 256 + data[2]
-                h = data[3] * 256 + data[4]
-                frame = np.zeros((h, w, 3), 'uint8')
+            if buff is None:
+                w = int(data[1] * 256 + data[2])
+                h = int(data[3] * 256 + data[4])
+                rows = w * h * 3 // BUFF_SIZE + 1
+                buff = np.zeros((h * w * 3), 'uint8')
 
-            offset = 32001 * data[0] // 3
-            pixels = data[5:]
-            print(w, h, offset)
-            for a in range(0, len(pixels), 3):
-                i = (offset) // 3 + a // 3
-                frame[i//w, i%w] = (pixels[a], pixels[a + 1], pixels[a + 2])
-            # Print received data and sender's address
+            offset = BUFF_SIZE * data[0]
+            size = min(w * h * 3 - offset,  BUFF_SIZE)
+            array = np.frombuffer(data, dtype=np.uint8)
+            buff[offset:offset + size] = array[CONTROL_BYTES:CONTROL_BYTES + size]
+            r += 1
+
+        w = int(data[1] * 256 + data[2])
+        h = int(data[3] * 256 + data[4])
+        frame = buff.reshape((h, w, 3))
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         cv2.imshow('Live Stream', frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):
+        if cv2.waitKey(10) & 0xFF == ord('q'):
             break
 
 request_receiving()
