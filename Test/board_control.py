@@ -2,7 +2,7 @@ import socket
 import keyboard
 import time
 
-IP_ADDRESS = '192.168.137.134'
+IP_ADDRESS = '192.168.137.133'
 PORT = 5101
 
 def send(steering, motor):

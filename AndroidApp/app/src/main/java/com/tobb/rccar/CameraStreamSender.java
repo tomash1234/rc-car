@@ -35,7 +35,6 @@ public class CameraStreamSender extends Thread{
     }
 
     private void send(byte[][] buf){
-        System.out.println("CAR SERVER sending to " + ipAddress + ", " + port + ", " + buf.length);
         DatagramPacket packet = null;
         for(int i = 0; i < buf.length; i++) {
             try {
@@ -54,7 +53,7 @@ public class CameraStreamSender extends Thread{
         while(isRunning) {
             getImage();
             try {
-                Thread.sleep(1000);
+                Thread.sleep(10);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -91,24 +90,26 @@ public class CameraStreamSender extends Thread{
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        int w = bitmap.getWidth();
-        int h = bitmap.getHeight();
+        Bitmap resizedBitmap = Bitmap.createScaledBitmap(
+                bitmap, bitmap.getWidth() / 2, bitmap.getHeight() / 2, false);
+        int w = resizedBitmap.getWidth();
+        int h = resizedBitmap.getHeight();
         int[] data = new int[w * h];
-        bitmap.getPixels(data, 0, w, 0, 0, w, h);
+        resizedBitmap.getPixels(data, 0, w, 0, 0, w, h);
         byteArray = new byte[data.length * 3 + 4];
         for(int i = 0; i < data.length; i++){
             int redValue = Color.red(data[i]);
             int blueValue = Color.blue(data[i]);
             int greenValue = Color.green(data[i]);
             byteArray[i*3 + 0] = (byte) redValue;
-            byteArray[i*3 + 1] = (byte) blueValue;
-            byteArray[i*3 + 2] = (byte) greenValue;
+            byteArray[i*3 + 1] = (byte) greenValue;
+            byteArray[i*3 + 2] = (byte) blueValue;
         }
         send(generatePackets(w, h, byteArray));
     }
 
     public byte[][] generatePackets(int w, int h, byte[] pixels){
-        int MAX_SIZE = 32001;
+        int MAX_SIZE = 54003;
         int offset = 0;
         byte count = 0;
         byte[][] bufs = new byte[(int)Math.ceil(1.0 * pixels.length / MAX_SIZE)][];
@@ -121,7 +122,7 @@ public class CameraStreamSender extends Thread{
             data[3] = (byte) (h / 256);
             data[4] = (byte) (h % 256);
             if (offset + size - offset >= 0)
-                System.arraycopy(pixels, offset, data, 4 + offset - offset, offset + size - offset);
+                System.arraycopy(pixels, offset, data, 5, size);
             bufs[count] = data;
             count += 1;
             offset += size;

@@ -41,3 +41,7 @@
 ## Board program
  - Shall receive info from phone and set motors and steering according it.
  - Connection using serial port or Wifi (hotspot)
+ - Run on port `5101`
+ - UDP Packet structure 3 bytes - `[1, STEERING, MOTOR]`
+   - `STEERING` - `1` - LEFT, `2` - RIGHT, `3` - STRAIGHT, other values does not change current status
+   - `MOTOR` - `1` - FORWARD, `2` - BACKWARD, `3` - STOP, other values does not change current status
