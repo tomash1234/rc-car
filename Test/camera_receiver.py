@@ -7,7 +7,7 @@ PORT = 42069
 
 
 def request_receiving(ip='192.168.14.112'):
-    local_ip = '192.168.14.105'
+    local_ip = '192.168.1.115' #'192.168.14.105'
     requests.get(f'http://{ip}:8080/setStream?ipAddress={local_ip}&port={PORT}')
     requests.get(f'http://{ip}:8080/startStream')
 
@@ -27,7 +27,7 @@ def receive_camera():
         rows = 10
         r = 0
         while r < rows:
-            data, addr = udp_socket.recvfrom(BUFF_SIZE + CONTROL_BYTES)  # 1024 is the buffer size
+            data, addr = udp_socket.recvfrom(BUFF_SIZE + CONTROL_BYTES)
 
             if buff is None:
                 w = int(data[1] * 256 + data[2])
@@ -47,9 +47,9 @@ def receive_camera():
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
         cv2.imshow('Live Stream', frame)
-        if cv2.waitKey(10) & 0xFF == ord('q'):
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-request_receiving()
+request_receiving('192.168.1.110')
 receive_camera()
-stop()
+stop('192.168.1.110')
