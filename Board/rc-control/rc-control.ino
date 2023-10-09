@@ -140,8 +140,8 @@ void read_serial(){
     }
 
     Serial.print("Received: ");
-    Serial.print(motor);  
     Serial.print(steering);
+    Serial.print(motor);  
   }
 }
 
