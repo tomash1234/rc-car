@@ -1,17 +1,22 @@
-#include "Servo.h"
+#define USE_WIFI false
+
 #include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
 
+
+// Set those variables only if USE_WIFI = true
 #define LOCAL_PORT 5101
 #define PACKET_SIZE 3
 
 #define WIFI_SSID "TomasProjects"
 #define WIFI_PASSWORD "TomasProjects"
+//
 
 #define PIN_RELE_BACKWARD D5
 #define PIN_RELE_FORWARD D6
 #define PIN_RELE_LEFT D7
 #define PIN_RELE_RIGHT D8
+
 
 WiFiUDP Udp; 
 
@@ -43,9 +48,13 @@ void setup() {
   pinMode(PIN_RELE_LEFT, OUTPUT);
   pinMode(PIN_RELE_RIGHT, OUTPUT);
 
-  
-  connect_to_wifi(WIFI_SSID, WIFI_PASSWORD);
-  Udp.begin(LOCAL_PORT);
+
+  if(USE_WIFI){
+    connect_to_wifi(WIFI_SSID, WIFI_PASSWORD);
+    Udp.begin(LOCAL_PORT);
+  }else{
+    Serial.println("Board started");
+  }
 }
 
 void turn_left(){
@@ -107,6 +116,39 @@ void read_packets(){
   }
 }
 
+void read_serial(){
+  while(Serial.available() >= 3){
+    byte control = Serial.read();
+    byte steering = Serial.read();
+    byte motor = Serial.read();
+
+    
+    if(steering == 1){
+      turn_left();
+    } else if(steering == 2){
+      turn_right();
+    } else if(steering == 3){
+      turn_streight();
+    }
+
+    if(motor == 1){
+      move_forward();
+    } else if(motor == 2){
+      move_backward();
+    } else if(motor == 3){
+      move_stop();
+    }
+
+    Serial.print("Received: ");
+    Serial.print(motor);  
+    Serial.print(steering);
+  }
+}
+
 void loop() {
-  read_packets();
+  if(USE_WIFI){
+    read_packets();
+  }else{
+    read_serial();
+  }
 }

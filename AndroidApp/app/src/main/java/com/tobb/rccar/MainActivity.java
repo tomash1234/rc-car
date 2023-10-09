@@ -2,8 +2,10 @@ package com.tobb.rccar;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.hardware.usb.UsbManager;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Build;
@@ -63,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     private CameraStreamSender cameraStreamSender;
     private String ipAddress;
     private int port;
+    private BoardCommunicator boardCommunicator;
+    private MyLogger logger;
 
     private Executor cameraExecutor = Executors.newSingleThreadExecutor();
 
@@ -79,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
         setSupportActionBar(toolbar);
 
         TextView tv = findViewById(R.id.tv_state);
-        MyLogger logger = new MyLogger(tv, this);
+        logger = new MyLogger(tv, this);
         mPreviewView = findViewById(R.id.camera);
 
         locationManager = (LocationManager)
@@ -103,7 +107,19 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        //BoardCommunicator boardCommunicator = new BoardCommunicator(this);
+        boardCommunicator = new BoardCommunicator(this, logger);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(boardCommunicator.getReceiver(), new IntentFilter("android.hardware.usb.action.USB_DEVICE_ATTACHED"));
+
     }
 
     public String getLocalIpAddress() {
@@ -127,6 +143,8 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     public void onDestroy()
     {
         super.onDestroy();
+
+        unregisterReceiver(boardCommunicator.getReceiver());
         if (server != null)
             server.stop();
     }
@@ -310,7 +328,19 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
     @Override
     public void drive(double motor, double steering) {
-        System.out.println("CAR SERVER drive " + motor + " " + steering);
+        byte motorByte = 3;
+        byte steeringByte = 3;
+        if(motor >= 0.5){
+            motorByte = 1;
+        }else if( motor < -0.5){
+            motorByte = 2;
+        }
+        if(steering >= 0.5){
+            steeringByte = 1;
+        }else if( steering < -0.5){
+            steeringByte = 2;
+        }
+        boardCommunicator.sendDriveCommand(motorByte, steeringByte);
     }
 
     @Override
