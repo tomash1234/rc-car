@@ -108,6 +108,12 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         boardCommunicator = new BoardCommunicator(this, logger);
+
+        findViewById(R.id.but_left).setOnClickListener(view -> drive(0, -1));
+        findViewById(R.id.but_right).setOnClickListener(view -> drive(0, 1));
+        findViewById(R.id.but_up).setOnClickListener(view -> drive(1, 0));
+        findViewById(R.id.but_down).setOnClickListener(view -> drive(-1, 0));
+        findViewById(R.id.but_stop).setOnClickListener(view -> drive(0, 0));
     }
 
     @Override

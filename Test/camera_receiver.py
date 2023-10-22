@@ -7,7 +7,7 @@ PORT = 42069
 
 
 def request_receiving(ip='192.168.14.112'):
-    local_ip = '192.168.1.115' #'192.168.14.105'
+    local_ip = '192.168.1.110' #'192.168.14.105'
     requests.get(f'http://{ip}:8080/setStream?ipAddress={local_ip}&port={PORT}')
     requests.get(f'http://{ip}:8080/startStream')
 
@@ -50,6 +50,6 @@ def receive_camera():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-request_receiving('192.168.1.110')
+request_receiving('192.168.1.108')
 receive_camera()
-stop('192.168.1.110')
+stop('192.168.1.180')
