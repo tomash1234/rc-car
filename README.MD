@@ -7,15 +7,15 @@
    - Phone 
    - Esp8266 
  - Software
-   - Computer Program to controll
+   - Computer Program to control
    - Android app
    - Board program
     
 ## Hardware
 
-<img src="img/car.png" width="200">
+<img src="img/car.png" width="400">
 
-<img src="img/overview.jpg" width="200">
+<img src="img/overview.jpg" width="400">
 
 
 ## Computer program
@@ -42,7 +42,7 @@
  - `GET /info` - return phone info 
  - `GET /camerapREVIEW` - return a small image 
  - `GET /position?timeout=` - return GPS position
- - `POST /drive?motor=[speed]&steering[angle]` -  control car
+ - `GET /drive?motor=[speed]&steering[angle]` -  control car
  - `POST /setStream?ipAddress=[ipAddress]&port[port]` -  set the stream receiver
  - `POST /startStream` -  start stream to the set receiver
  - `POST /stopStream` -  stop stream
