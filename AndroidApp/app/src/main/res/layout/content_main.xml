@@ -19,7 +19,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="LEFT" />
+            android:text="LF" />
 
         <Button
             android:id="@+id/but_up"
@@ -33,14 +33,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="DOWN" />
+            android:text="DN" />
 
         <Button
             android:id="@+id/but_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Right" />
+            android:text="RT" />
 
         <Button
             android:id="@+id/but_stop"

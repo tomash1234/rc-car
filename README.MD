@@ -1,5 +1,6 @@
 # RC Car
 
+
 ## Overview
  - Hardware
    - Car
@@ -9,6 +10,13 @@
    - Computer Program to controll
    - Android app
    - Board program
+    
+## Hardware
+
+<img src="img/car.png" width="200">
+
+<img src="img/overview.jpg" width="200">
+
 
 ## Computer program
 
@@ -26,6 +34,8 @@
  - Shall be able to stream camera to computer program in real time 
  - Shall be able to send GPS and other phone info
  - Shall be able to connect the board and send command (speed, steering)
+
+<img src="img/app.png" width="200">
 
 ### API
  - `GET /camera` - return image 

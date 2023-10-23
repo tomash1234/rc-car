@@ -10,10 +10,9 @@
 
 #define WIFI_SSID "TomasProjects"
 #define WIFI_PASSWORD "TomasProjects"
-//
 
-#define PIN_RELE_RIGHT D3
-#define PIN_RELE_BACKWARD D5
+#define PIN_RELE_RIGHT D5
+#define PIN_RELE_BACKWARD D3
 #define PIN_RELE_FORWARD D6
 #define PIN_RELE_LEFT D7
 
@@ -146,7 +145,6 @@ void read_serial(){
 }
 
 void loop() {
-   turn_right();
   if(USE_WIFI){
     read_packets();
   }else{

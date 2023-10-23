@@ -1,6 +1,7 @@
 package com.tobb.rccar;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
@@ -33,6 +34,7 @@ import androidx.lifecycle.LifecycleOwner;
 
 import android.util.Log;
 import android.util.Size;
+import android.view.MotionEvent;
 import android.view.View;
 
 import android.view.Menu;
@@ -74,6 +76,7 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
             "^(([01]?\\d\\d?|2[0-4]\\d|25[0-5])\\.){3}([01]?\\d\\d?|2[0-4]\\d|25[0-5])$");
 
 
+    @SuppressLint("ClickableViewAccessibility")
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,10 +112,38 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
         boardCommunicator = new BoardCommunicator(this, logger);
 
-        findViewById(R.id.but_left).setOnClickListener(view -> drive(0, -1));
-        findViewById(R.id.but_right).setOnClickListener(view -> drive(0, 1));
-        findViewById(R.id.but_up).setOnClickListener(view -> drive(1, 0));
-        findViewById(R.id.but_down).setOnClickListener(view -> drive(-1, 0));
+        findViewById(R.id.but_left).setOnTouchListener((View view, MotionEvent event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                drive(3, 1);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                //drive(0, 0);
+            }
+            return true;
+        });
+        findViewById(R.id.but_right).setOnTouchListener((view, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                drive(3, -1);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                //drive(3, 0);
+            }
+            return true;
+        });
+        findViewById(R.id.but_up).setOnTouchListener((view, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                drive(1, 3);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                //drive(0, 3);
+            }
+            return true;
+        });
+        findViewById(R.id.but_down).setOnTouchListener((view, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                drive(-1, 3);
+            } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                //drive(0, 3);
+            }
+            return true;
+        });
         findViewById(R.id.but_stop).setOnClickListener(view -> drive(0, 0));
     }
 
@@ -336,12 +367,18 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     public void drive(double motor, double steering) {
         byte motorByte = 3;
         byte steeringByte = 3;
-        if(motor >= 0.5){
+
+        if(motor >= 3) {
+            motorByte = 0;
+        }else if(motor >= 0.5){
             motorByte = 1;
         }else if( motor < -0.5){
             motorByte = 2;
         }
-        if(steering >= 0.5){
+
+        if(steering >=3 ) {
+            steeringByte = 0;
+        }else if(steering >= 0.5){
             steeringByte = 1;
         }else if( steering < -0.5){
             steeringByte = 2;
