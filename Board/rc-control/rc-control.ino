@@ -1,4 +1,4 @@
-#define USE_WIFI false
+#define USE_WIFI true
 
 #include <WiFiUdp.h>
 #include <ESP8266WiFi.h>
@@ -7,6 +7,8 @@
 // Set those variables only if USE_WIFI = true
 #define LOCAL_PORT 5101
 #define PACKET_SIZE 3
+
+#define BROADCAST_RECEIVER_PORT 5102
 
 #define WIFI_SSID "TomasProjects"
 #define WIFI_PASSWORD "TomasProjects"
@@ -17,7 +19,10 @@
 #define PIN_RELE_LEFT D7
 
 
+bool pairMode = true;
+
 WiFiUDP Udp; 
+IPAddress broadCastIp;
 
 void connect_to_wifi(const char* ssid, const char* password){
   WiFi.mode(WIFI_STA);
@@ -29,7 +34,7 @@ void connect_to_wifi(const char* ssid, const char* password){
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.print(++i); Serial.print(' ');
-    if(i > 10){
+    if(i > 20){
       Serial.println("Failed! No connection");  
       for(;;){}
       break;
@@ -38,6 +43,8 @@ void connect_to_wifi(const char* ssid, const char* password){
   Serial.println("Connection established!");  
   Serial.print("IP address:\t");
   Serial.println(WiFi.localIP());
+  broadCastIp = WiFi.localIP();
+  broadCastIp[3] = 255;
 }
 
 void setup() {
@@ -93,6 +100,7 @@ void move_stop(){
 
 void read_packets(){
   if(Udp.parsePacket()){ 
+    pairMode = false;
     uint8_t received[PACKET_SIZE];
     int len = Udp.read(received, PACKET_SIZE);
     if(len == PACKET_SIZE && received[0] == 1){
@@ -144,8 +152,20 @@ void read_serial(){
   }
 }
 
+void sendBroadcast(){
+  if(!pairMode){
+    return;
+  }
+  Udp.beginPacket(broadCastIp, BROADCAST_RECEIVER_PORT);
+  Udp.write("rccar");
+  Udp.endPacket();
+  Serial.println("Send broadcast packet");
+  delay(1000);
+}
+
 void loop() {
   if(USE_WIFI){
+    sendBroadcast();
     read_packets();
   }else{
     read_serial();

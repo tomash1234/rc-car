@@ -2,15 +2,27 @@ import socket
 import keyboard
 import time
 
-IP_ADDRESS = '192.168.137.133'
 PORT = 5101
+IP_ADDRESS = ''
 
-def send(steering, motor):
+
+def send(steering, motor, ip_address):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    sock.sendto(bytes([1, steering, motor]), (IP_ADDRESS, PORT))
+    sock.sendto(bytes([1, steering, motor]), (ip_address, PORT))
+
+
+def discovery_board():
+    print('Waiting for board discovery')
+    soc = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    soc.bind(('0.0.0.0', 5102))
+    message, sender = soc.recvfrom(10)
+    ip_address = sender[0]
+    return ip_address
 
 
 def main():
+    ip_address = discovery_board()
+    print(f'Sending to {ip_address}')
     while True:
         steering = 3
         motor = 3
@@ -25,10 +37,8 @@ def main():
         if keyboard.is_pressed("q"):
             print('QUIT')
             break
-        send(steering, motor)
+        send(steering, motor, ip_address)
         time.sleep(0.1)
-    
+
 
 main()
-
-
