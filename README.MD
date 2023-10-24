@@ -14,6 +14,9 @@
     
 ## Hardware
 
+[See instructions here](doc/hardware.md)
+
+
 <img src="img/car.png" width="400">
 
 <img src="img/overview.jpg" width="400">
