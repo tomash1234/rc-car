@@ -20,6 +20,6 @@ Componets needed:
    - <img src="../img/chip_back.png" width="300">
 5. Connect wires to Wemos as described in the schema above
 6. Done
-   - <img src="../img/completed_circuit.png" width="500">
+   - <img src="../img/completed_circuit.jpg" width="500">
 
 ## Car modifications
