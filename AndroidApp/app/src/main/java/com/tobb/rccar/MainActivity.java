@@ -6,14 +6,11 @@ import android.content.Context;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.hardware.usb.UsbManager;
 import android.location.LocationManager;
 import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.common.util.concurrent.ListenableFuture;
 
 import androidx.annotation.NonNull;
@@ -32,7 +29,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.lifecycle.LifecycleOwner;
 
-import android.util.Log;
 import android.util.Size;
 import android.view.MotionEvent;
 import android.view.View;
@@ -48,6 +44,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.Enumeration;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
@@ -55,8 +52,6 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import fi.iki.elonen.NanoHTTPD;
 
 public class MainActivity extends AppCompatActivity implements PhoneInfoProvider, CarControl{
 
@@ -110,7 +105,10 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        boardCommunicator = new BoardCommunicator(this, logger);
+        // use this if board is connected via usb directly to phone
+        //boardCommunicator = new SerialBoardCommunicator(this, logger);
+
+        boardCommunicator = new WifiBoardCommunicator(logger);
 
         findViewById(R.id.but_left).setOnTouchListener((View view, MotionEvent event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
@@ -155,7 +153,7 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     @Override
     protected void onResume() {
         super.onResume();
-        registerReceiver(boardCommunicator.getReceiver(), new IntentFilter("android.hardware.usb.action.USB_DEVICE_ATTACHED"));
+        boardCommunicator.onResume(this);
 
     }
 
@@ -181,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     {
         super.onDestroy();
 
-        unregisterReceiver(boardCommunicator.getReceiver());
+        boardCommunicator.onDestroy(this);
         if (server != null)
             server.stop();
     }
