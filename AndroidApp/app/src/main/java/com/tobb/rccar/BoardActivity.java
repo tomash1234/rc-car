@@ -53,7 +53,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-public class MainActivity extends AppCompatActivity implements PhoneInfoProvider, CarControl{
+public class BoardActivity extends AppCompatActivity implements PhoneInfoProvider, CarControl{
 
     private CarServer server;
     private PreviewView mPreviewView;
@@ -178,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements PhoneInfoProvider
     public void onDestroy()
     {
         super.onDestroy();
-
         boardCommunicator.onDestroy(this);
         if (server != null)
             server.stop();

@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="8dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/et_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="IP Adress and port"
+            android:inputType="textPersonName" />
+
+        <Button
+            android:id="@+id/but_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="CONNECT" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="4dp">
+
+        <TextView
+            android:id="@+id/tv_connect_info"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="No connected" />
+
+        <TextView
+            android:id="@+id/tv_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgStreamView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        app:srcCompat="@drawable/ic_launcher_background" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="4dp">
+
+        <Button
+            android:id="@+id/but_start_stream"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="START STREAM" />
+
+        <Button
+            android:id="@+id/but_stop_stream"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="STOP STREAM" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ccc"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp">
+
+        <Button
+            android:id="@+id/but_forward"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="-4dp"
+            android:text="UP" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/but_go_left"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="0"
+                android:text="LEFT" />
+
+            <Button
+                android:id="@+id/but_backward"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:layout_weight="0"
+                android:text="BACK" />
+
+            <Button
+                android:id="@+id/but_go_right"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_weight="0"
+                android:text="RIGHT" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

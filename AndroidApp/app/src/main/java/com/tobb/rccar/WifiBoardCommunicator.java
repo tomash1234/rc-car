@@ -42,6 +42,7 @@ public class WifiBoardCommunicator implements BoardCommunicator{
     @Override
     public void onDestroy(Activity activity) {
         run = false;
+        discoveryBoardThread.discoverySocket.close();
     }
 
     public class DiscoveryBoardThread extends Thread{

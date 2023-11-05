@@ -19,16 +19,29 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.RCCar">
-        <activity
-            android:name=".MainActivity"
+
+
+        <activity android:name=".MenuActivity"
             android:label="@string/app_name"
             android:exported="true"
             android:theme="@style/Theme.RCCar.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+
+        <activity android:name=".ControlActivity"
+            android:label="@string/app_name"
+            android:exported="true"
+            android:theme="@style/Theme.RCCar.NoActionBar">
+        </activity>
+
+        <activity
+            android:name=".BoardActivity"
+            android:label="@string/app_name"
+            android:exported="true"
+            android:theme="@style/Theme.RCCar.NoActionBar">
 
             <intent-filter>
                 <action android:name="android.hardware.usb.action.USB_DEVICE_ATTACHED" />
