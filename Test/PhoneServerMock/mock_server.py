@@ -9,7 +9,6 @@ from http.server import BaseHTTPRequestHandler
 from PIL import Image
 
 
-
 def read_file(file):
     with open(file) as f:
         return f.read()
@@ -61,7 +60,9 @@ class ThreadStopper:
     def stop(self):
         self.running = False
 
+
 THREAD_STOPPER = None
+
 
 def camera_thread(ip_address, port, stopper):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -152,7 +153,6 @@ class PhoneServer(BaseHTTPRequestHandler):
         thread = threading.Thread(target=camera_thread, args=(settings['ipAddress'], settings['port'], THREAD_STOPPER))
         thread.start()
         self.reply('Stream started')
-
 
     def serve_stop_stream(self):
         THREAD_STOPPER.stop()

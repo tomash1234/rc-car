@@ -8,13 +8,16 @@ PORT = 42069
 IP_ADDRESS = '127.0.0.1'
 PORT_SENDER = 8088
 
+
 def request_receiving(ip):
-    local_ip = '127.0.0.1' #'192.168.1.110' #'192.168.14.105'
+    local_ip = '127.0.0.1'  # '192.168.1.110' #'192.168.14.105'
     requests.get(f'http://{ip}:{PORT_SENDER}/setStream?ipAddress={local_ip}&port={PORT}')
     requests.get(f'http://{ip}:{PORT_SENDER}/startStream')
 
+
 def stop(ip):
     requests.get(f'http://{ip}:{PORT_SENDER}/stopStream')
+
 
 def receive_camera():
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -38,7 +41,7 @@ def receive_camera():
                 buff = np.zeros((h * w * 3), 'uint8')
 
             offset = BUFF_SIZE * data[0]
-            size = min(w * h * 3 - offset,  BUFF_SIZE)
+            size = min(w * h * 3 - offset, BUFF_SIZE)
             array = np.frombuffer(data, dtype=np.uint8)
             buff[offset:offset + size] = array[CONTROL_BYTES:CONTROL_BYTES + size]
             r += 1
@@ -51,6 +54,7 @@ def receive_camera():
         cv2.imshow('Live Stream', frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
+
 
 request_receiving(IP_ADDRESS)
 receive_camera()
