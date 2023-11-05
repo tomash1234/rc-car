@@ -5,14 +5,16 @@ import cv2
 
 PORT = 42069
 
+IP_ADDRESS = '127.0.0.1'
+PORT_SENDER = 8088
 
-def request_receiving(ip='192.168.14.112'):
-    local_ip = '192.168.1.110' #'192.168.14.105'
-    requests.get(f'http://{ip}:8080/setStream?ipAddress={local_ip}&port={PORT}')
-    requests.get(f'http://{ip}:8080/startStream')
+def request_receiving(ip):
+    local_ip = '127.0.0.1' #'192.168.1.110' #'192.168.14.105'
+    requests.get(f'http://{ip}:{PORT_SENDER}/setStream?ipAddress={local_ip}&port={PORT}')
+    requests.get(f'http://{ip}:{PORT_SENDER}/startStream')
 
-def stop(ip='192.168.14.112'):
-    requests.get(f'http://{ip}:8080/stopStream')
+def stop(ip):
+    requests.get(f'http://{ip}:{PORT_SENDER}/stopStream')
 
 def receive_camera():
     udp_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -50,6 +52,6 @@ def receive_camera():
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
-request_receiving('192.168.1.108')
+request_receiving(IP_ADDRESS)
 receive_camera()
-stop('192.168.1.180')
+stop(IP_ADDRESS)
