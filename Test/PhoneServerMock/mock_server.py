@@ -165,7 +165,7 @@ class PhoneServer(BaseHTTPRequestHandler):
         self.end_headers()
         self.wfile.write(bytes(message, 'utf8'))
 
-    def reply_image(self, path, status_code=200, content_type='text/plain'):
+    def reply_image(self, path, status_code=200):
         self.send_response(status_code)
         self.send_header('Content-type', 'image/jpeg; charset=utf-8')
         self.end_headers()
