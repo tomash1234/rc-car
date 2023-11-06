@@ -7,6 +7,8 @@ import android.os.Bundle;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tobb.rccar.control.ControlActivity;
+
 public class MenuActivity extends AppCompatActivity {
 
     @SuppressLint("ClickableViewAccessibility")

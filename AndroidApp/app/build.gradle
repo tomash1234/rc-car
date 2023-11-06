@@ -45,4 +45,5 @@ dependencies {
     implementation "androidx.camera:camera-view:${camerax_version}"
     implementation "androidx.camera:camera-extensions:${camerax_version}"
     implementation 'com.github.felHR85:UsbSerial:6.1.0'
+    implementation 'com.android.volley:volley:1.1.1'
 }
