@@ -19,6 +19,7 @@ public class PhoneCommunicator {
     private String url;
     private Context context;
     private ReceiveResponse receiveResponse;
+    private boolean connected = false;
 
     public PhoneCommunicator(Context context, ReceiveResponse receiveResponse){
         this.context = context;
@@ -34,11 +35,11 @@ public class PhoneCommunicator {
     }
 
     public void getPosition(){
-
+        send(Request.Method.GET, "position", TAG_POSITION);
     }
 
     public void drive(float motor, float steering){
-
+        send(Request.Method.GET, "drive?motor=" + motor + "&steering=" + steering, TAG_DRIVE);
     }
 
     public void testConnection() {
@@ -52,7 +53,10 @@ public class PhoneCommunicator {
     public void send(int method, String endpoint, int tag){
         RequestQueue queue = Volley.newRequestQueue(context);
         String uri = url + "/" + endpoint;
-        StringRequest stringRequest = new StringRequest(method, uri, response -> receiveResponse.receive(tag, response, 200, false), error ->
+        StringRequest stringRequest = new StringRequest(method, uri, response -> {
+            connected = true;
+            receiveResponse.receive(tag, response, 200, false);
+        }, error ->
         {
             if(error.networkResponse != null){
                 receiveResponse.receive(tag, null, error.networkResponse.statusCode, true);
@@ -61,5 +65,9 @@ public class PhoneCommunicator {
             }
         });
         queue.add(stringRequest);
+    }
+
+    public boolean isConnected() {
+        return connected;
     }
 }
