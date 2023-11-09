@@ -1,21 +1,27 @@
 package com.tobb.rccar.control;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.tobb.rccar.BoardActivity;
 import com.tobb.rccar.R;
 
-public class ControlActivity extends AppCompatActivity implements ReceiveResponse {
+public class ControlActivity extends AppCompatActivity implements ReceiveResponse, StreamDisplayer {
 
     private TextView tvInfo, tvConnectionInfo, tvGPS;
     private PhoneCommunicator phoneCommunicator;
     private CountDownTimer countDownInfoUpdater, countDownDriveUpdater;
+    private ImageView imageView;
+    private CameraStreamReceiver cameraStreamReceiver = new CameraStreamReceiver(this);
 
     private int motor = 0;
     private int steering = 0;
@@ -31,6 +37,7 @@ public class ControlActivity extends AppCompatActivity implements ReceiveRespons
         tvConnectionInfo = findViewById(R.id.tv_connect_info);
         tvGPS = findViewById(R.id.tv_position);
         phoneCommunicator = new PhoneCommunicator(this, this);
+        imageView = findViewById(R.id.imgStreamView);
         EditText editText = findViewById(R.id.et_address);
         editText.setText("http://192.168.14.169:8088");
 
@@ -82,6 +89,20 @@ public class ControlActivity extends AppCompatActivity implements ReceiveRespons
                 return true;
             });
         }
+
+        findViewById(R.id.but_start_stream).setOnClickListener(view -> {
+            if(phoneCommunicator != null && phoneCommunicator.isConnected()){
+                phoneCommunicator.startStream(BoardActivity.getLocalIpAddress(), CameraStreamReceiver.PORT_RECEIVER);
+                cameraStreamReceiver.start();
+            }
+        });
+        findViewById(R.id.but_stop_stream).setOnClickListener(view -> {
+            if(phoneCommunicator != null && phoneCommunicator.isConnected()){
+
+                phoneCommunicator.stopStream();
+                cameraStreamReceiver.stop();
+            }
+        });
     }
 
     private void updateGpsAndInfo(){
@@ -136,6 +157,7 @@ public class ControlActivity extends AppCompatActivity implements ReceiveRespons
         super.onPause();
         countDownInfoUpdater.cancel();
         countDownDriveUpdater.cancel();
+        cameraStreamReceiver.dispose();
     }
 
     @Override
@@ -143,5 +165,10 @@ public class ControlActivity extends AppCompatActivity implements ReceiveRespons
         super.onResume();
         countDownInfoUpdater.start();
         countDownDriveUpdater.start();
+    }
+
+    @Override
+    public void show(Bitmap bitmap) {
+        runOnUiThread(() -> imageView.setImageBitmap(bitmap));
     }
 }

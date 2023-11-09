@@ -15,6 +15,8 @@ public class PhoneCommunicator {
     public static final int TAG_POSITION = 2;
     public static final int TAG_DRIVE = 3;
     public static final int TAG_TEST = 4;
+    public static final int TAG_START_STREAM = 5;
+    public static final int TAG_STOP_STREAM = 6;
 
     private String url;
     private Context context;
@@ -69,5 +71,14 @@ public class PhoneCommunicator {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public void startStream(String ipAddress, int port) {
+        send(Request.Method.GET, "setStream?ipAddress=" + ipAddress + "&port=" + port, TAG_START_STREAM);
+        send(Request.Method.GET, "startStream", TAG_START_STREAM);
+    }
+
+    public void stopStream() {
+        send(Request.Method.GET, "stopStream", TAG_STOP_STREAM);
     }
 }

@@ -138,9 +138,11 @@ class PhoneServer(BaseHTTPRequestHandler):
     def serve_set_stream(self, params):
         kv_params = get_kv_params(params)
         if 'ipAddress' not in kv_params or 'port' not in kv_params:
+            print('Problem IP address set')
             self.reply("Request has to contain ipAddress and port parameters", status_code=400)
             return
         data = load_json('configs/config_store_data.json')
+        print('IP address set')
         with open(data['streamData'], 'w') as f:
             json.dump(kv_params, f)
         self.reply(f'Set stream to {kv_params["ipAddress"]}:{kv_params["port"]}')
