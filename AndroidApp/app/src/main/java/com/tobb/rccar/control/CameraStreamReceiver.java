@@ -40,11 +40,11 @@ public class CameraStreamReceiver {
             public void run() {
 
                 byte [] fullImage = null;
+                int width = 0, height = 0;
+                int rows = 10;
                 while(isRunning){
 
-                    int rows = 10;
                     int row = 0;
-                    int width = 0, height = 0;
                     while (row < rows) {
                         byte[] data = new byte[BUFF_SIZE + CONTROL_SIZE];
                         DatagramPacket datagramPacket = new DatagramPacket(data, data.length);
@@ -54,24 +54,22 @@ public class CameraStreamReceiver {
                             e.printStackTrace();
                             continue;
                         }
-                        width = data[1] * 256 + data[2];
-                        height = data[3] * 256 + data[4];
+                        if(fullImage == null || fullImage.length != width * height * 3){
+                            width = ((data[1] & 0xFF) << 8) | (data[2] & 0xFF);
+                            height = ((data[3] & 0xFF) << 8) | (data[4] & 0xFF);
+                            fullImage = new byte[width * height * 3];
+                            rows = width * height * 3 / BUFF_SIZE + 1;
+                        }
                         int offset = BUFF_SIZE * data[0];
                         int size = Math.min(width * height * 3 - offset, BUFF_SIZE);
-                        rows = width * height * 3 / BUFF_SIZE + 1;
-                        if(fullImage == null || fullImage.length != width * height * 3){
-                            fullImage = new byte[width * height * 3];
-                        }
                         row++;
                         if(data[0] >= rows){
                             continue;
                         }
                         System.arraycopy(data, CONTROL_SIZE, fullImage, offset, size);
                     }
-
-                    System.out.println("Building image");
                     int[] colors = new int[width * height];
-                    for(int i = 0; i < fullImage.length; i +=3){
+                    for(int i = 0; i < fullImage.length; i += 3){
                         colors[i / 3] = Color.rgb(fullImage[i], fullImage[i + 1], fullImage[i + 2]);
                     }
                     Bitmap bitmap = Bitmap.createBitmap(colors, width, height, Bitmap.Config.RGB_565);
